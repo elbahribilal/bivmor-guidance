@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense } from 'react';
-import { useSearchParams, notFound } from 'next/navigation'; // تمت إضافة notFound
+import { useSearchParams } from 'next/navigation';
 import { useNavigationStore } from '@/store/navigation';
 import { useAdminAuthStore } from '@/store/admin-auth';
 import { Header } from '@/components/layout/Header';
@@ -73,16 +73,11 @@ function PageContent() {
   const { isAuthenticated } = useAdminAuthStore();
   const searchParams = useSearchParams();
   
+  // التحقق المباشر من مسار الأدمين لتسهيل التطوير
   const isAdminRoute = searchParams.get('admin') === 'true';
-  const isSeparatedAdmin = process.env.NEXT_PUBLIC_ADMIN_IS_SEPARATE === 'true';
 
-  // 1. نظام الحماية الجديد: إذا تم تفعيل فصل الأدمين، نمنع الوصول من هذا الرابط تماماً!
-  if (isAdminRoute && isSeparatedAdmin) {
-    return notFound(); // سيُظهر صفحة 404 افتراضية لكي لا يعلم المخترق بوجود الأدمين
-  }
-
-  // 2. إذا لم يتم الفصل بعد (للتطوير المحلي مثلاً)، نعرض لوحة التحكم
-  if (isAdminRoute && !isSeparatedAdmin) {
+  // إذا كنا في مسار الأدمين، نعرض لوحة الدخول أو لوحة التحكم مباشرة
+  if (isAdminRoute) {
     return (
       <div className="min-h-screen flex flex-col">
         <ErrorBoundary>
@@ -92,7 +87,7 @@ function PageContent() {
     );
   }
 
-  // Public interface - no admin code here
+  // Public interface
   const renderView = () => {
     switch (currentView) {
       case 'home':
@@ -125,7 +120,6 @@ function PageContent() {
         return <UserProfileView />;
       case 'competition-detail':
       case 'school-detail':
-        // These are handled by dialogs, show the last main view
         return <HomeView />;
       default:
         return <HomeView />;
@@ -145,23 +139,12 @@ function PageContent() {
       </main>
       <Footer />
 
-      {/* Detail Dialogs (always mounted so they can be opened from any view) */}
       <CompetitionDetailDialog />
       <SchoolDetailDialog />
-
-      {/* Welcome Guide Overlay for first-time visitors */}
       <WelcomeGuide />
-
-      {/* Back to top button */}
       <BackToTop />
-
-      {/* Mobile Bottom Navigation */}
       <MobileBottomNav />
-
-      {/* User Auth Modal */}
       <UserAuthModal />
-
-      {/* Keyboard Shortcuts */}
       <KeyboardShortcuts />
     </div>
   );
