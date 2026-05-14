@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, notFound } from 'next/navigation'; // تمت إضافة notFound
 import { useNavigationStore } from '@/store/navigation';
 import { useAdminAuthStore } from '@/store/admin-auth';
 import { Header } from '@/components/layout/Header';
@@ -72,10 +72,17 @@ function PageContent() {
   const { currentView } = useNavigationStore();
   const { isAuthenticated } = useAdminAuthStore();
   const searchParams = useSearchParams();
+  
   const isAdminRoute = searchParams.get('admin') === 'true';
+  const isSeparatedAdmin = process.env.NEXT_PUBLIC_ADMIN_IS_SEPARATE === 'true';
 
-  // If admin route, show admin interface (completely separate from public)
-  if (isAdminRoute) {
+  // 1. نظام الحماية الجديد: إذا تم تفعيل فصل الأدمين، نمنع الوصول من هذا الرابط تماماً!
+  if (isAdminRoute && isSeparatedAdmin) {
+    return notFound(); // سيُظهر صفحة 404 افتراضية لكي لا يعلم المخترق بوجود الأدمين
+  }
+
+  // 2. إذا لم يتم الفصل بعد (للتطوير المحلي مثلاً)، نعرض لوحة التحكم
+  if (isAdminRoute && !isSeparatedAdmin) {
     return (
       <div className="min-h-screen flex flex-col">
         <ErrorBoundary>
