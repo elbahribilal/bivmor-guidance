@@ -21,7 +21,9 @@ import type {
   NewsFilters,
 } from '@/types';
 
-const BASE_URL = '/api';
+// 1. التعديل الجوهري: جعل الرابط ديناميكياً لدعم الفصل التام بين الواجهة والباكاند
+// إذا كان هناك رابط خارجي سيستخدمه، وإلا سيستخدم الرابط المحلي الافتراضي
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '/api';
 
 // Get auth cookies for authenticated requests
 function getAuthHeaders(): Record<string, string> {
@@ -36,6 +38,8 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
       ...getAuthHeaders(),
       ...options?.headers,
     },
+    // السماح بإرسال ملفات تعريف الارتباط (Cookies) حتى لو كان الباكاند في نطاق مختلف
+    credentials: 'omit', // قم بتغييرها إلى 'include' إذا أردت إرسال الـ Cookies عبر نطاقات مختلفة (Cross-origin) مستقبلاً
     ...options,
   });
 
@@ -272,7 +276,8 @@ export const notificationsApi = {
 export const adminAuthApi = {
   checkSession: async (): Promise<{ authenticated: boolean; user?: { id: string; email: string; name: string | null; role: string } }> => {
     try {
-      const res = await fetch('/api/admin/session');
+      // 2. تحديث روابط NextAuth لتستخدم الـ BASE_URL الجديد
+      const res = await fetch(`${BASE_URL}/admin/session`);
       if (res.ok) {
         return await res.json();
       }
@@ -285,11 +290,11 @@ export const adminAuthApi = {
   login: async (email: string, password: string): Promise<boolean> => {
     try {
       // Get CSRF token
-      const csrfRes = await fetch('/api/auth/csrf');
+      const csrfRes = await fetch(`${BASE_URL}/auth/csrf`);
       const csrfData = await csrfRes.json();
 
       // Sign in with credentials
-      await fetch('/api/auth/callback/credentials', {
+      await fetch(`${BASE_URL}/auth/callback/credentials`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({
@@ -301,7 +306,7 @@ export const adminAuthApi = {
       });
 
       // Check session after login
-      const sessionRes = await fetch('/api/admin/session');
+      const sessionRes = await fetch(`${BASE_URL}/admin/session`);
       const sessionData = await sessionRes.json();
       return sessionData.authenticated === true;
     } catch {
@@ -311,7 +316,7 @@ export const adminAuthApi = {
 
   logout: async (): Promise<void> => {
     try {
-      await fetch('/api/auth/signout', { method: 'POST' });
+      await fetch(`${BASE_URL}/auth/signout`, { method: 'POST' });
     } catch {
       // Ignore
     }
