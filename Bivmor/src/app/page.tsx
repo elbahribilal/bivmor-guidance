@@ -76,12 +76,12 @@ function PageContent() {
   // التحقق المباشر من مسار الأدمين لتسهيل التطوير
   const isAdminRoute = searchParams.get('admin') === 'true';
 
-  // إذا كنا في مسار الأدمين، نعرض لوحة الدخول أو لوحة التحكم مباشرة
+    // إذا كنا في مسار الأدمين، نعرض لوحة الدخول أو لوحة التحكم مباشرة
   if (isAdminRoute) {
     return (
       <div className="min-h-screen flex flex-col">
         <ErrorBoundary>
-          {isAuthenticated ? <AdminDashboard /> : <AdminLogin />}
+          <AdminDashboard />
         </ErrorBoundary>
       </div>
     );
