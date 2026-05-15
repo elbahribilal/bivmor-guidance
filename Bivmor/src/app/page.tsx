@@ -73,15 +73,16 @@ function PageContent() {
   const { isAuthenticated } = useAdminAuthStore();
   const searchParams = useSearchParams();
   
-  // التحقق المباشر من مسار الأدمين لتسهيل التطوير
+ 
+  // التحقق المباشر من مسار الأدمين
   const isAdminRoute = searchParams.get('admin') === 'true';
 
-    // إذا كنا في مسار الأدمين، نعرض لوحة الدخول أو لوحة التحكم مباشرة
+  // التعديل هنا: إذا كنا في مسار الأدمين، نتحقق من تسجيل الدخول أولاً
   if (isAdminRoute) {
     return (
       <div className="min-h-screen flex flex-col">
         <ErrorBoundary>
-          <AdminDashboard />
+          {isAuthenticated ? <AdminDashboard /> : <AdminLogin />}
         </ErrorBoundary>
       </div>
     );
