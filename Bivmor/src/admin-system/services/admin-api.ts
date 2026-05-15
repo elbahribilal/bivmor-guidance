@@ -56,6 +56,7 @@ function getAuthHeaders(): Record<string, string> {
 
 async function fetchAdminApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${adminApiBaseUrl}${endpoint}`, {
+    credentials: 'include', // <=== أضف هذا السطر السحري هنا!
     headers: {
       ...getAuthHeaders(),
       ...options?.headers,
@@ -73,6 +74,7 @@ async function fetchAdminApi<T>(endpoint: string, options?: RequestInit): Promis
 
   return response.json();
 }
+
 
 // ============================================
 // COMPETITIONS API
