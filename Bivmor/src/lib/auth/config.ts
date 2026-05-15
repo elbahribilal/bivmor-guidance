@@ -9,7 +9,8 @@ import { db } from '@/lib/db';
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
-      id: 'admin-credentials',
+      // قمنا بتغيير المعرف ليتطابق مع طلب الـ Fetch في الواجهة الأمامية
+      id: 'credentials', 
       name: 'Admin Login',
       credentials: {
         email: { label: 'البريد الإلكتروني', type: 'email' },
@@ -17,34 +18,32 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error('البريد الإلكتروني وكلمة المرور مطلوبان');
+          return null;
         }
 
         const user = await db.user.findUnique({
-          where: { email: credentials.email },
+          where: { email: credentials.email.toLowerCase() },
         });
 
-        if (!user) {
-          throw new Error('بيانات الدخول غير صحيحة');
+        // إذا لم يوجد المستخدم أو لا يملك كلمة مرور
+        if (!user || !user.password) {
+          return null;
         }
 
-        if (!user.password) {
-          throw new Error('بيانات الدخول غير صحيحة');
-        }
-
+        // التحقق من حالة الحساب
         if (!user.isActive) {
-          throw new Error('هذا الحساب معطل');
+          return null;
         }
 
+        // مقارنة كلمة المرور
         const isValidPassword = await compare(credentials.password, user.password);
-
         if (!isValidPassword) {
-          throw new Error('بيانات الدخول غير صحيحة');
+          return null;
         }
 
-        // Only allow ADMIN and EDITOR roles
+        // التحقق من الرتبة (ADMIN أو EDITOR)
         if (user.role !== 'ADMIN' && user.role !== 'EDITOR') {
-          throw new Error('ليس لديك صلاحية الوصول');
+          return null;
         }
 
         return {
@@ -59,15 +58,15 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = (user as { role: string }).role;
+        token.role = (user as any).role;
         token.id = user.id;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as { role: string }).role = token.role as string;
-        (session.user as { id: string }).id = token.id as string;
+        (session.user as any).role = token.role;
+        (session.user as any).id = token.id;
       }
       return session;
     },
@@ -78,8 +77,8 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: 'jwt',
-    maxAge: 24 * 60 * 60, // 24 hours
+    maxAge: 24 * 60 * 60, // 24 ساعة
   },
   secret: process.env.NEXTAUTH_SECRET,
-  debug: false,
+  debug: process.env.NODE_ENV === 'development',
 };
