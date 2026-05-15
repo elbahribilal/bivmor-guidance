@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { useNavigationStore } from '@/store/navigation';
+import { useAdminAuthStore } from '@/store/admin-auth'; // تمت إضافة استيراد متجر الأدمين
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
-import { Menu, Search, Moon, Sun, GraduationCap, Trophy, Home, Grid3X3, Heart, GitCompare, BarChart3, MapPin, Calendar, HelpCircle, MoreHorizontal, ChevronDown, Bell, ClipboardList } from 'lucide-react';
+import { Menu, Search, Moon, Sun, GraduationCap, Trophy, Home, Grid3X3, Heart, GitCompare, BarChart3, MapPin, Calendar, HelpCircle, MoreHorizontal, ChevronDown, Bell, ClipboardList, ShieldAlert } from 'lucide-react'; // تمت إضافة ShieldAlert لأيقونة الأدمين
 import { useTheme } from 'next-themes';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { UserProfileMenu } from '@/components/user/UserProfileMenu';
@@ -36,6 +37,7 @@ const allNavItems = [...primaryNavItems, ...secondaryNavItems];
 
 export function Header() {
   const { currentView, setView, setSearchQuery } = useNavigationStore();
+  const { user, isAuthenticated } = useAdminAuthStore(); // سحب بيانات الأدمين
   const { theme, setTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -142,6 +144,20 @@ export function Header() {
 
         {/* Actions */}
         <div className="flex items-center gap-0.5">
+          
+          {/* زر الأدمين المخفي: يظهر فقط إذا كان المستخدم مسجلاً ورتبته ADMIN */}
+          {isAuthenticated && user?.role === 'ADMIN' && (
+             <Button
+               variant="outline"
+               size="sm"
+               onClick={() => window.location.href = '/?admin=true'}
+               className="hidden lg:flex border-red-500/30 text-red-600 hover:bg-red-50 hover:text-red-700 gap-1.5 ml-2"
+             >
+               <ShieldAlert className="h-4 w-4" />
+               الإدارة
+             </Button>
+          )}
+
           {/* Notification Bell */}
           <NotificationBell />
 
@@ -176,6 +192,19 @@ export function Header() {
             <SheetContent side="right" className="w-72" dir="rtl">
               <SheetTitle className="text-right mb-6">القائمة</SheetTitle>
               <nav className="flex flex-col gap-1.5 mt-4">
+                
+                {/* زر الأدمين في الموبايل */}
+                {isAuthenticated && user?.role === 'ADMIN' && (
+                   <Button
+                     variant="outline"
+                     onClick={() => window.location.href = '/?admin=true'}
+                     className="justify-start gap-3 h-11 rounded-lg border-red-500/30 text-red-600 hover:bg-red-50 hover:text-red-700 mb-2"
+                   >
+                     <ShieldAlert className="h-4 w-4" />
+                     لوحة الإدارة
+                   </Button>
+                )}
+
                 {allNavItems.map((item) => (
                   <Button
                     key={item.view}
