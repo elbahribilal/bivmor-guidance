@@ -13,7 +13,7 @@ export const envConfig = {
 
   // Database
   database: {
-    url: process.env.DATABASE_URL || 'file:./db/custom.db',
+    url: process.env.POSTGRES_PRISMA_URL || 'file:./db/custom.db',
   },
 
   // Admin Auth (NextAuth)
