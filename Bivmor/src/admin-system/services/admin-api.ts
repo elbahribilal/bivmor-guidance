@@ -376,7 +376,7 @@ export const adminAuthApi = {
       const csrfData = await csrfRes.json();
 
       // Sign in with credentials
-      await fetch(`${adminApiBaseUrl}/auth/callback/credentials`, {
+      await fetch(`${adminApiBaseUrl}/auth/callback/admin-credentials`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({
