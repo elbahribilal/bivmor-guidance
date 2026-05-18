@@ -1,8 +1,8 @@
 import { db } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAdminAuth } from '@/lib/auth/api-guard'
+import { requireAdminAuth } from '@/lib/auth/admin-guard'
 
-function slugify(text: string): string {
+function slugify(text: string): string 
   return text
     .toLowerCase()
     .replace(/[àáâãäå]/g, 'a')
