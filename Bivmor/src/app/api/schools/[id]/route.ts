@@ -1,6 +1,6 @@
 import { db } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAdminAuth } from '@/lib/auth/api-guard'
+import { requireAdminAuth } from '@/lib/auth/admin-guard
 
 // GET /api/schools/[id] - Get single school with competitions
 export async function GET(
