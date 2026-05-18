@@ -1,6 +1,6 @@
 import { db } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAdminAuth } from '@/lib/auth/admin-guard'
+import { requireAdminAuth } from '@/admin-system/auth/admin-guard';
 
 // GET /api/competitions/[id] - Get single competition
 export async function GET(
