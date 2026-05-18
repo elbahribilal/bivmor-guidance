@@ -2,8 +2,8 @@ import { db } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminAuth } from '@/admin-system/auth/admin-guard';
 
-function slugify(text: string): string 
-  return text {
+function slugify(text: string): string {
+  return text
     .toLowerCase()
     .replace(/[àáâãäå]/g, 'a')
     .replace(/[èéêë]/g, 'e')
@@ -12,8 +12,9 @@ function slugify(text: string): string
     .replace(/[ùúûü]/g, 'u')
     .replace(/[ç]/g, 'c')
     .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
+    .replace(/^-+|-+$/g, '');
 }
+
 
 // GET /api/schools - List schools with filters
 export async function GET(request: NextRequest) {
