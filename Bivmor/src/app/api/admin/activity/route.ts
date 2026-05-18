@@ -3,7 +3,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { requireAdminAuth } from '@/lib/auth/admin-guard';
+import { requireAdminAuth } from '@/admin-system/auth/admin-guard';
 
 export async function GET(request: NextRequest) {
   const authResult = await requireAdminAuth(request);
