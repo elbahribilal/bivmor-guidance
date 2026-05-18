@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminAuth } from '@/admin-system/auth/admin-guard';
 
 function slugify(text: string): string 
-  return text
+  return text {
     .toLowerCase()
     .replace(/[àáâãäå]/g, 'a')
     .replace(/[èéêë]/g, 'e')
