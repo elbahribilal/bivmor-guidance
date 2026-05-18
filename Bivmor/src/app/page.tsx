@@ -1,9 +1,11 @@
 'use client';
 
-import { Suspense } from 'react';
+// 1. أضفنا useEffect هنا
+import { Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useNavigationStore } from '@/store/navigation';
-import { useAdminAuthStore } from '@/store/admin-auth';
+// 2. استيراد المخزن الجديد المستقل بدلاً من القديم
+import { useAdminStore } from '@/admin-system/auth/admin-store'; 
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { HeroSection } from '@/components/home/HeroSection';
@@ -70,15 +72,30 @@ function HomeView() {
 
 function PageContent() {
   const { currentView } = useNavigationStore();
-  const { isAuthenticated } = useAdminAuthStore();
-  const searchParams = useSearchParams();
   
- 
-  // التحقق المباشر من مسار الأدمين
+  // 3. استخدمنا useAdminStore وجلبنا isLoading و checkSession
+  const { isAuthenticated, isLoading, checkSession } = useAdminStore();
+  const searchParams = useSearchParams();
+
   const isAdminRoute = searchParams.get('admin') === 'true';
 
-  // التعديل هنا: إذا كنا في مسار الأدمين، نتحقق من تسجيل الدخول أولاً
+  // 4. أضفنا هذا الـ useEffect لإجبار النظام على التحقق من السيرفر عند فتح رابط الأدمين
+  useEffect(() => {
+    if (isAdminRoute) {
+      checkSession();
+    }
+  }, [isAdminRoute, checkSession]);
+
   if (isAdminRoute) {
+    // 5. عرض شاشة تحميل حتى ينتهي السيرفر من التحقق من الكوكيز
+    if (isLoading) {
+      return (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+        </div>
+      );
+    }
+
     return (
       <div className="min-h-screen flex flex-col">
         <ErrorBoundary>
