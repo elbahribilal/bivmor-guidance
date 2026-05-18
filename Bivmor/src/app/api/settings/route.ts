@@ -1,6 +1,6 @@
 import { db } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAdminAuth } from '@/lib/auth/admin-guard'
+import { requireAdminAuth } from '@/admin-system/auth/admin-guard';
 
 // GET /api/settings - Get all site settings
 export async function GET() {
