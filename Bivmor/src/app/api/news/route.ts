@@ -1,6 +1,6 @@
 import { db } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAdminAuth } from '@/lib/auth/api-guard'
+import { requireAdminAuth } from '@/lib/auth/admin-guard'
 
 // GET /api/news - List published news with pagination, category filter, search
 export async function GET(request: NextRequest) {
